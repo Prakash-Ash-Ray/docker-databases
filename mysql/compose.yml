@@ -1,0 +1,43 @@
+services:
+  mysql:
+    image: mysql:8.4
+    # restart: unless-stopped
+    
+    cpus: 2
+    mem_limit: 2g
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    networks:
+      - dev-network
+      
+    healthcheck:
+      test: ["CMD-SHELL", "MYSQL_PWD=\"$${MYSQL_ROOT_PASSWORD}\" mysqladmin ping -h localhost -u root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+     
+    logging:
+      driver: json-file
+      options:
+          max-size: "10m"
+          max-file: "3"    
+    
+volumes:
+  mysql_data:
+
+networks:
+  dev-network:
+    name: dev-network
+    external: true

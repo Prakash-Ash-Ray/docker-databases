@@ -1,0 +1,42 @@
+services:
+  redis:
+    image: redis:8
+    #restart: unless-stopped
+
+    command: redis-server --appendonly yes
+
+    ports:
+      - "6379:6379"
+
+    volumes:
+      - redis_data:/data
+
+    networks:
+      - dev-network
+
+    cpus: 1
+    mem_limit: 1g
+
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    security_opt:
+      - "no-new-privileges:true"
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  redis_data:
+
+networks:
+  dev-network:
+    name: dev-network
+    external: true
